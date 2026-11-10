@@ -1,0 +1,11 @@
+name = "kriti-trivia-api"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+[vars]
+# Your GitHub Pages origin, e.g. https://yourname.github.io  (comma-separate for several)
+ALLOWED_ORIGINS = "https://kriti1908.github.io"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "82a93ccf14e248eaaf1dbde8d564395f"

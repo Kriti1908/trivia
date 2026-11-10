@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How well do you know Kriti? 🎀</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#ffd6e7;--lav:#e4d9ff;--mint:#d5f5e3;--peach:#ffe5d0;--sky:#d6ecff;--ink:#5b4b6b;--acc:#ff8fb8;--acc2:#b79cff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:'Fredoka','Nunito',system-ui,sans-serif;color:var(--ink);
+background:linear-gradient(135deg,var(--pink),var(--lav) 50%,var(--sky));display:flex;justify-content:center;align-items:flex-start;padding:24px 14px;overflow-x:hidden}
+.float{position:fixed;font-size:28px;opacity:.55;animation:fl 6s ease-in-out infinite;pointer-events:none}
+@keyframes fl{50%{transform:translateY(-14px) rotate(8deg)}}
+.card{position:relative;z-index:1;width:100%;max-width:520px;background:#fffafc;border-radius:32px;padding:28px 22px;
+box-shadow:0 10px 30px #b79cff44,0 0 0 5px #fff;text-align:center;margin-top:4vh}
+h1{font-size:30px;margin:8px 0;line-height:1.2}h2{font-size:22px;margin:8px 0}
+p{margin:8px 0;font-size:17px}
+.big{font-size:84px;line-height:1;margin:6px 0}
+.pic{width:210px;max-width:70%;height:auto;mix-blend-mode:multiply;margin:4px auto;display:block}
+button{font-family:inherit;cursor:pointer;border:0;color:#fff;font-size:19px;font-weight:600;padding:13px 30px;border-radius:999px;
+background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 5px 0 #d97aa4;transition:.12s}
+button:hover{transform:translateY(-2px)}button:active{transform:translateY(3px);box-shadow:0 2px 0 #d97aa4}
+.opt{display:block;width:100%;margin:10px 0;background:var(--lav);color:var(--ink);box-shadow:0 4px 0 #cdbdf5;text-align:left;font-size:18px;padding:13px 18px}
+.opt:nth-child(2n){background:var(--mint);box-shadow:0 4px 0 #b9e5cc}.opt.sel{background:var(--acc);color:#fff;box-shadow:0 4px 0 #d97aa4}
+.bar{height:16px;background:#fff;border-radius:99px;overflow:hidden;box-shadow:inset 0 2px 4px #0001;margin:6px 0 4px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:99px;transition:width .4s}
+.small{font-size:14px;opacity:.8}.q{font-size:22px;font-weight:600;margin:14px 0}
+.hide{display:none}.math{background:var(--peach);border-radius:20px;padding:14px;text-align:left;font-size:17px;line-height:1.5;margin:12px 0}
+input{font-family:inherit;font-size:20px;padding:11px 16px;border-radius:99px;border:3px solid var(--lav);width:100%;text-align:center;color:var(--ink);margin:6px 0 12px;outline:0}
+input:focus{border-color:var(--acc)}.err{color:#d6557f;min-height:22px}
+.clue{margin-top:22px;background:var(--mint);border:3px dashed #8fd6ae;border-radius:22px;padding:16px;font-size:20px;font-weight:600}
+.sad{background:linear-gradient(#f3f6ff,#fffafc)}.rain{font-size:22px;letter-spacing:10px;opacity:.6}
+</style></head><body>
+<span class="float" style="left:6%;top:10%">🌸</span><span class="float" style="right:8%;top:16%;animation-delay:1s">🎀</span>
+<span class="float" style="left:10%;bottom:12%;animation-delay:2s">☁️</span><span class="float" style="right:7%;bottom:18%;animation-delay:3s">⭐</span>
+
+<main class="card" id="app"></main>
+
+<script src="config.js"></script>
+<script>
+const $=s=>document.querySelector(s),app=$('#app');
+const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};
+const pic=(src,emo)=>`<div class="big">${emo}</div><img class="pic" src="${src}" alt="" onerror="this.remove()" onload="this.previousElementSibling.remove()">`;
+const api=async(path,body)=>{
+ const r=await fetch(window.API_URL+path,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{});
+ const j=await r.json().catch(()=>({}));
+ if(!r.ok&&!j.expired)throw new Error(j.error||'oops');
+ return j;};
+
+function home(){
+ app.className='card';
+ app.innerHTML=`${pic('img/cheer.gif','🐰🎀')}<h1>How well do you know Kriti? 💗</h1>
+ <p>10 cute questions.<br>Get them all right to unlock a secret ✨</p><p><button id="go">Start trivia 🌸</button></p>`;
+ $('#go').onclick=begin;
+}
+function fail(msg,fn){
+ app.className='card';
+ app.innerHTML=`<div class="big">🥺</div><p></p><p><button id="again">Okay</button></p>`;
+ app.querySelector('p').textContent=msg;$('#again').onclick=fn||home;
+}
+async function begin(){
+ app.innerHTML='<div class="big">🧁</div><p>Loading…</p>';
+ try{quiz(await api('/api/start'))}catch(e){fail(e.message)}
+}
+
+function quiz({attempt,questions}){
+ let i=0;const ans=[];
+ const show=()=>{
+  const q=questions[i];
+  app.className='card';app.innerHTML='';
+  app.append(el('div','small',`Question ${i+1}/${questions.length}`));
+  const bar=el('div','bar');bar.innerHTML=`<i style="width:${i/questions.length*100}%"></i>`;app.append(bar);
+  app.append(el('div','q',q.q));
+  let locked=false;
+  q.options.forEach(t=>{const b=el('button','opt',t);b.onclick=()=>{
+   if(locked)return;locked=true;b.classList.add('sel');ans.push(t);
+   setTimeout(()=>{++i<questions.length?show():submit(attempt,ans)},300);};app.append(b);});
+ };show();
+}
+
+async function submit(attempt,answers){
+ app.innerHTML='<div class="big">🧁</div><p>Counting your answers…</p>';
+ try{
+  const r=await api('/api/submit',{attempt,answers});
+  if(r.expired)return fail('That attempt expired, start again!');
+  r.correct?win(r.clue):sad(r);
+ }catch(e){fail(e.message)}
+}
+
+function win(clue){
+ app.className='card';
+ app.innerHTML=`${pic('img/cheer.gif','🥳🎉')}<h1>Yayyy!! so you DO know me!! 💖</h1><p>10/10 — you're the best ✨</p>
+ <div class="rain">🌸🎀🌸🎀🌸</div><div class="clue"></div>`;
+ app.querySelector('.clue').textContent=clue;
+}
+
+function sad(r){
+ app.className='card sad';
+ app.innerHTML=`<div class="rain">🌧️ ☁️ 🌧️</div>${pic('img/cry.gif','🥺😢')}<h1>SOB you don't know me after all SOBBBB 😭</h1>
+ <p><b>${r.wrong}/${r.total}</b> wrong</p><p><button id="retry">Try again 🥹</button></p>`;
+ $('#retry').onclick=()=>gate(r.challenge);
+}
+
+function gate(c){
+ app.className='card';
+ app.innerHTML=`${pic('img/cry.gif','🧮🐻')}<h2>Wait! Prove your worth first 📚</h2><p class="small">Solve this to try again</p>
+ <div class="math">${c.text}</div><input id="ans" inputmode="decimal" placeholder="your answer"><div class="err" id="err"></div>
+ <button id="chk">Check ✨</button>`;
+ const chk=async()=>{
+  try{
+   const r=await api('/api/retry',{challenge:c.id,answer:$('#ans').value});
+   if(r.expired)return fail('That puzzle expired — start again!');
+   r.ok?quiz(r):($('#err').textContent='Hmm, not quite 🥲 check your working!');
+  }catch(e){$('#err').textContent=e.message}};
+ $('#chk').onclick=chk;$('#ans').onkeydown=e=>e.key==='Enter'&&chk();
+}
+home();
+</script></body></html>

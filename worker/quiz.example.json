@@ -1,0 +1,19 @@
+{
+  "clue": "next clue: REPLACE-ME",
+  "mail": {
+    "from": "your-verified-sender@gmail.com",
+    "to": ["first@example.com", "second@example.com"]
+  },
+  "questions": [
+    { "q": "What is Kriti's favourite colour?", "options": ["Pink", "Blue", "Green", "Yellow"], "correct": "Yellow" },
+    { "q": "What is Kriti's go-to comfort food?", "options": ["Pasta", "Maggi", "Pizza", "Ice cream"], "correct": "Pasta" },
+    { "q": "Which animal would Kriti adopt?", "options": ["Cat", "Dog", "Bunny", "Panda"], "correct": "Panda" },
+    { "q": "Kriti's dream holiday?", "options": ["Beach", "Mountains", "Paris", "Staycation"], "correct": "Mountains" },
+    { "q": "Kriti's favourite season?", "options": ["Summer", "Monsoon", "Winter", "Spring"], "correct": "Monsoon" },
+    { "q": "Kriti's favourite drink?", "options": ["Coffee", "Chai", "Boba", "Juice"], "correct": "Coffee" },
+    { "q": "Is Kriti a morning or night person?", "options": ["Early bird", "Night owl", "Both", "Neither"], "correct": "Night owl" },
+    { "q": "Kriti's favourite snack?", "options": ["Chips", "Chocolate", "Fruit", "Popcorn"], "correct": "Popcorn" },
+    { "q": "Kriti's comfort movie genre?", "options": ["Rom-com", "Horror", "Sci-fi", "Anime"], "correct": "Anime" },
+    { "q": "Kriti's favourite emoji?", "options": ["😭", "🥺", "✨", "🐰"], "correct": "🥺" }
+  ]
+}
