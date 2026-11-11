@@ -36,6 +36,7 @@ input:focus{border-color:var(--acc)}.err{color:#d6557f;min-height:22px}
 <main class="card" id="app"></main>
 
 <script src="config.js"></script>
+<script>if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname))document.write('<script src="config.local.js"><\/script>')</script>
 <script>
 const $=s=>document.querySelector(s),app=$('#app');
 const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};
@@ -66,7 +67,7 @@ function askPw(){
   if(busy)return;busy=true;$('#err').textContent='';
   try{quiz(await api('/api/start',{password:$('#pw').value}))}
   catch(e){busy=false;$('#err').textContent=e.message}};
- $('#ok').onclick=go;$('#pw').onkeydown=e=>e.key==='Enter'&&go();$('#pw').focus();
+ $('#ok').onclick=go;$('#pw').onkeydown=e=>{if(e.key==='Enter')go();};$('#pw').focus();
 }
 
 function quiz({attempt,questions}){
@@ -118,7 +119,7 @@ function gate(c){
    if(r.expired)return fail('That puzzle expired — start again!');
    r.ok?quiz(r):($('#err').textContent='Hmm, not quite 🥲 check your working!');
   }catch(e){$('#err').textContent=e.message}};
- $('#chk').onclick=chk;$('#ans').onkeydown=e=>e.key==='Enter'&&chk();
+ $('#chk').onclick=chk;$('#ans').onkeydown=e=>{if(e.key==='Enter')chk();};
 }
 home();
 </script></body></html>

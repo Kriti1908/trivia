@@ -150,7 +150,7 @@ not matching your Pages origin exactly (no trailing slash, no repo path).
 - **Colours / fonts:** CSS variables at the top of `docs/index.html`.
 - **Math puzzles:** the `GEN` list in `worker/src/index.js`. Each returns `{ t: text, a: answer, int: true/false }`.
   Decimal answers accept a small tolerance, integer answers must be exact.
-- **Test locally:** create `worker/.dev.vars` containing `QUIZ_JSON=<quiz.json on one line>` and
-  `BREVO_API_KEY=...`, run `npx wrangler dev`, and set `docs/config.js` to `http://localhost:8787`
-  (add `http://localhost:8000` to `ALLOWED_ORIGINS` and serve `docs/` with `python3 -m http.server 8000`).
+- **Test locally (no Cloudflare login needed):** see "Testing locally" in the root of this zip's `TESTING-LOCALLY.md`
+  (short version: `cd worker && cp quiz.example.json quiz.json` if needed, `node make-devvars.mjs`, `npx wrangler dev --port 8787`,
+  serve `docs/` on port 8000, and put `window.API_URL = "http://localhost:8787";` in `docs/config.local.js`).
 - **Free-tier note:** Cloudflare KV allows ~1000 writes/day on the free plan. That's plenty for a friends quiz.
