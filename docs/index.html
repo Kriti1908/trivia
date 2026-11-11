@@ -50,16 +50,23 @@ function home(){
  app.className='card';
  app.innerHTML=`${pic('img/cheer.gif','🐰🎀')}<h1>How well do you know Kriti? 💗</h1>
  <p>10 cute questions.<br>Get them all right to unlock a secret ✨</p><p><button id="go">Start trivia 🌸</button></p>`;
- $('#go').onclick=begin;
+ $('#go').onclick=askPw;
 }
 function fail(msg,fn){
  app.className='card';
  app.innerHTML=`<div class="big">🥺</div><p></p><p><button id="again">Okay</button></p>`;
  app.querySelector('p').textContent=msg;$('#again').onclick=fn||home;
 }
-async function begin(){
- app.innerHTML='<div class="big">🧁</div><p>Loading…</p>';
- try{quiz(await api('/api/start'))}catch(e){fail(e.message)}
+function askPw(){
+ app.className='card';
+ app.innerHTML=`${pic('img/cheer.gif','🔒🎀')}<h2>Secret password please 🔐</h2><p class="small">Only people who know me know it 🤫</p>
+ <input id="pw" type="password" placeholder="password" autocomplete="off"><div class="err" id="err"></div><button id="ok">Unlock ✨</button>`;
+ let busy=false;
+ const go=async()=>{
+  if(busy)return;busy=true;$('#err').textContent='';
+  try{quiz(await api('/api/start',{password:$('#pw').value}))}
+  catch(e){busy=false;$('#err').textContent=e.message}};
+ $('#ok').onclick=go;$('#pw').onkeydown=e=>e.key==='Enter'&&go();$('#pw').focus();
 }
 
 function quiz({attempt,questions}){

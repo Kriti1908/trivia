@@ -38,7 +38,7 @@ kriti-quiz/                     ← the repo root (what you push to GitHub)
 
 | I want to… | File |
 |---|---|
-| Change questions, options, correct answers, the clue, recipient emails | `worker/quiz.json` (then re-run the `wrangler secret put QUIZ_JSON` command) |
+| Change the password, questions, options, correct answers, the clue, recipient emails | `worker/quiz.json` (then re-run the `wrangler secret put QUIZ_JSON` command) |
 | Set the sender email for notifications | `"from"` inside `worker/quiz.json` |
 | Add the Brevo API key | Not in any file: `npx wrangler secret put BREVO_API_KEY` |
 | Point the website at the server | `docs/config.js` |
@@ -56,7 +56,7 @@ questions + shuffled options. The server decides everything else:
 
 | Thing | Where it lives |
 |---|---|
-| Correct answers, the clue, recipient emails | Worker **secret** `QUIZ_JSON` (never in git, never sent to the browser) |
+| Password, correct answers, the clue, recipient emails | Worker **secret** `QUIZ_JSON` (never in git, never sent to the browser) |
 | Scoring | Server. Browser sends its picks, gets back only "n wrong" |
 | The "yayyy + next clue" screen | The clue only arrives in the response to a perfect submission. No client-side flag can unlock it |
 | Math puzzle before retry | Generated and checked server-side; a new attempt is only issued after a correct solution |
@@ -80,6 +80,7 @@ cp worker/quiz.example.json worker/quiz.json
 
 ```json
 {
+  "password": "momentofinertia",
   "clue": "next clue: <your string>",
   "mail": { "from": "verified-sender@gmail.com", "to": ["a@x.com", "b@y.com"] },
   "questions": [
@@ -88,6 +89,8 @@ cp worker/quiz.example.json worker/quiz.json
 }
 ```
 
+- **`password`** is asked when someone clicks *Start trivia* (case-insensitive). It is checked on the server, so it never appears
+  in the website's code. If `password` is missing from `quiz.json`, the quiz stays locked.
 - **`correct` is the option's text, not a number.** It must match one of the `options` exactly.
 - Options are shuffled automatically on every attempt, so the correct answer is *never* stuck in the same
   position. You don't need to balance A/B/C/D yourself. Just don't write options like "All of the above"; if you must,
