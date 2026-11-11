@@ -15,14 +15,6 @@ const GEN = [
     return { t: `An arithmetic series has first term ${a} and common difference ${d}. Find the sum of its first ${n} terms, then multiply by ${k}.`, a: k * (n / 2) * (2 * a + (n - 1) * d), int: true }; },
   () => { const v = rnd(18, 45), h = rnd(5, 40), vy = v * Math.sin(Math.PI / 6);
     return { t: `A ball is thrown at ${v} m/s at 30° above horizontal from a cliff ${h} m high. Taking g = 9.8 m/s², how long (in seconds) until it hits the ground below? <span class="small">(2 decimal places)</span>`, a: (vy + Math.sqrt(vy * vy + 2 * 9.8 * h)) / 9.8 }; },
-  () => { const r = rnd(4, 12), n = rnd(5, 9), p = rnd(2, 5), q = rnd(3, 7);
-    return { t: `A bag contains ${r} red and ${n} blue counters. Two counters are drawn without replacement. What is the probability that both are red? Give your answer as a percentage. <span class="small">(2 decimal places)</span>`, a: 100 * r * (r - 1) / ((r + n) * (r + n - 1)) }; },
-  () => { const radius = rnd(6, 18), angle = rnd(45, 135);
-    return { t: `Find the area of a sector with radius ${radius} cm and angle ${angle}°. Use π = 3.14159. <span class="small">(2 decimal places)</span>`, a: 3.14159 * radius * radius * angle / 360 }; },
-  () => { const price = rnd(120, 480), discount = rnd(12, 28), tax = rnd(5, 18);
-    return { t: `An item costs $${price}. A ${discount}% discount is applied, followed by ${tax}% sales tax on the discounted price. What is the final price in dollars? <span class="small">(2 decimal places)</span>`, a: price * (1 - discount / 100) * (1 + tax / 100) }; },
-  () => { const workers = rnd(4, 9), days = rnd(8, 18), extra = rnd(2, 5);
-    return { t: `${workers} workers can complete a job in ${days} days. At the same rate, how many days would ${workers + extra} workers take? <span class="small">(2 decimal places)</span>`, a: workers * days / (workers + extra) }; },
 ];
 
 export default {
@@ -77,10 +69,17 @@ export default {
       if (!Array.isArray(b.answers) || b.answers.length !== n) return out({ error: 'bad request' }, 400);
       const good = quiz.questions.filter((q, i) => b.answers[i] === q.correct).length;
       const msg = `kriti trivia attempted ${good}/${n} correct`;
-      ctx.waitUntil(fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST', headers: { 'api-key': env.BREVO_API_KEY || '', 'content-type': 'application/json' },
-        body: JSON.stringify({ sender: { email: quiz.mail.from, name: 'Kriti Trivia' }, to: quiz.mail.to.map(email => ({ email })), subject: msg, textContent: msg }),
-      }).catch(() => {}));
+      ctx.waitUntil((async () => {                       // email failures are logged (see `npx wrangler tail`), never shown to players
+        if (!env.BREVO_API_KEY) return console.error('EMAIL SKIPPED: secret BREVO_API_KEY is not set');
+        try {
+          const r = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST', headers: { 'api-key': env.BREVO_API_KEY, 'content-type': 'application/json', 'accept': 'application/json' },
+            body: JSON.stringify({ sender: { email: quiz.mail.from, name: 'Kriti Trivia' }, to: quiz.mail.to.map(email => ({ email })), subject: msg, textContent: msg }),
+          });
+          if (r.ok) console.log('email accepted by Brevo', r.status);
+          else console.error('EMAIL FAILED', r.status, await r.text());
+        } catch (e) { console.error('EMAIL ERROR', e && e.message); }
+      })());
       if (good === n) return out({ correct: true, clue: quiz.clue });
       return out({ correct: false, wrong: n - good, total: n, challenge: await newChallenge() });
     }
